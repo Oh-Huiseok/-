@@ -2,6 +2,7 @@
     "files.associations": {
         "*.tcc": "cpp",
         "strassen,cpp": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "vector": "cpp"
     }
 }
