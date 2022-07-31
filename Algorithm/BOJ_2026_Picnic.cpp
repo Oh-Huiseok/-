@@ -1,4 +1,5 @@
 #include <iostream>
+#include<algorithm>
 #include <vector>
 
 using namespace std;
@@ -8,7 +9,7 @@ vector<int> ans;
 
 int n, k, f;
 bool flag = true;
-int startchk(mat &M, int s, vector<int>& comb) {
+int startchk(mat &M, int s) {
 	int cnt = 0;
 	for (int i = 1; i <= n; i++) {
 		if (M[s][i] == 1)
@@ -18,7 +19,6 @@ int startchk(mat &M, int s, vector<int>& comb) {
 	if (cnt >= k-1)
 		return 1;
 	else {
-		comb.clear();
 		for (int i = 1; i <= n; i++) {
 			M[s][i] = 0;
 			M[i][s] = 0;
@@ -29,24 +29,28 @@ int startchk(mat &M, int s, vector<int>& comb) {
 
 void picnic(int s, mat &M, vector<int> comb) {
 	if (!flag)
-		return;
-	if (!startchk(M, s, comb))
-		return;
+		return;;
 	if (comb.size() == k) {
 		ans.resize(comb.size());
 		copy(comb.begin(), comb.end(), ans.begin());
 		flag = false;
 		return;
 	}
-	vector<int> temp;
-	temp.resize(comb.size());
- 	copy(comb.begin(), comb.end(), temp.begin());
-
-	for (int i = s+1; i <= n; i++) {
+	
+	for (int i = 1; i <= n; i++) {
+		if (find(comb.begin(), comb.end(), i) != comb.end())
+			continue;
 		if (M[s][i] == 1) {
-			comb.push_back(i);
-			picnic(i, M, comb);
-			comb.pop_back();
+			bool flag2 = true;
+			for (int j = 0; j < comb.size(); j++) {
+				if (M[i][comb[j]] != 1)
+					flag2 = false;
+			}
+			if (flag2) {
+				comb.push_back(i);
+				picnic(i, M, comb);
+				comb.pop_back();
+			}
 		}
 	}
 
@@ -70,6 +74,8 @@ int main() {
 
 
 	for (int i = 1; i <= n; i++) {
+		if (!startchk(m, i))
+			continue;
 		vector<int> comb;
 		comb.push_back(i);
 		picnic(i, m, comb);
