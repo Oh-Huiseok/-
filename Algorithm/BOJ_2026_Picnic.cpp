@@ -7,7 +7,7 @@ typedef vector<vector<int>> mat;
 vector<int> ans;
 
 int n, k, f;
-
+bool flag = true;
 int startchk(mat &M, int s, vector<int>& comb) {
 	int cnt = 0;
 	for (int i = 1; i <= n; i++) {
@@ -28,11 +28,14 @@ int startchk(mat &M, int s, vector<int>& comb) {
 }
 
 void picnic(int s, mat &M, vector<int> comb) {
+	if (!flag)
+		return;
 	if (!startchk(M, s, comb))
 		return;
 	if (comb.size() == k) {
 		ans.resize(comb.size());
 		copy(comb.begin(), comb.end(), ans.begin());
+		flag = false;
 		return;
 	}
 	vector<int> temp;
@@ -43,12 +46,16 @@ void picnic(int s, mat &M, vector<int> comb) {
 		if (M[s][i] == 1) {
 			comb.push_back(i);
 			picnic(i, M, comb);
+			comb.pop_back();
 		}
 	}
 
 }
 
 int main() {
+	ios::sync_with_stdio(false);
+	cin.tie(NULL);
+	cout.tie(NULL);
 
 	cin >> k >> n >> f;
 
@@ -70,9 +77,12 @@ int main() {
 			break;
 		}
 	}
-	
-	for (int i = 0; i < ans.size(); i++) {
-		cout << ans[i] << "\n";
+	if (flag)
+		cout << "-1";
+	else {
+		for (int i = 0; i < ans.size(); i++) {
+			cout << ans[i] << "\n";
+		}
 	}
 	return 0;
 }
