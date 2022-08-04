@@ -20,13 +20,13 @@ vector<int> ans;
 int score = 0;
 
 const block blocktypes[4][3] = {
-	{{0, 0}, {1, 0}, {0, 1}}, 
-	{{0, 0}, {0, 1}, {1, 1}},
-	{{0 ,0}, {1, 0}, {1, 1}},
-	{{0, 1}, {1, 1}, {1, 0}}
+	{{0, 0}, {0, 1}, {1, 1}}, 
+	{{0 ,0}, {1, 0}, {1, -1}},
+	{{0, 0}, {1, 0}, {1, 1}},
+	{{1, 0}, {0, 0}, {0, 1}}
 };
 
-bool chk(gamecover g) { // 원래 덮혀있었으면 1, 안덮었으면 0
+bool chk(gamecover g) {
 	for (int i = 0; i < g.y; i++) {
 		for (int j = 0; j < g.x; j++) {
 			if (g.mat[i][j] == 0)
@@ -64,13 +64,23 @@ bool possible(gamecover g, int y, int x, int t) {
 	return true;
 }
 
-void boardcover(gamecover g, int y, int x) {//재귀함수 초반에 가장 가까운 0 찾는 알고리즘 추가하기
+void boardcover(gamecover g, int y, int x) {
 	if (chk(g)) {
 		score++;
 		return;
 	}
-
 	int posy, posx;
+	for (int i = 0; i < g.y; i++) {
+		for (int j = 0; j < g.x; j++) {
+			if (g.mat[i][j] == 0) {
+				y = i;
+				x = j;
+				break;
+			}
+		}
+		if (g.mat[y][x] == 0)
+			break;
+	}
 
 	for (int i = 0; i < 4; i++) {
 		if (possible(g, y, x, i)) {
@@ -79,7 +89,7 @@ void boardcover(gamecover g, int y, int x) {//재귀함수 초반에 가장 가�
 				posx = blocktypes[i][j].x + x;
 				g.mat[posy][posx] = 1;
 			}
-			print(g);
+			//print(g);
 			boardcover(g, y, x);
 			for (int j = 0; j < 3; j++) {
 				posy = blocktypes[i][j].y + y;
@@ -132,11 +142,7 @@ int main() {
 			ans.push_back(0);
 		}
 		else {
-			for (int j = 0; i < games[i].y; j++) {
-				for (int k = 0; j < games[i].x; k++) {
-					boardcover(games[i], j, k);
-				}
-			}
+			boardcover(games[i], 0, 0);
 			ans.push_back(score);
 		}
 		score = 0;
