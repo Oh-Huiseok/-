@@ -2,6 +2,7 @@ import pyupbit
 import pandas as pd
 import time
 import datetime
+import sys
 
 keys = open('/mnt/c/Users/오희석/api키.txt','r')
 keys = keys.read().splitlines()
@@ -16,8 +17,16 @@ secret = keys[1][7:]
 def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
     df = pyupbit.get_ohlcv(ticker, interval="minute30", count=8)
-    #print(df)
-    target_price = df.iloc[0]['close'] + (df.iloc[0]['high'] - df.iloc[0]['low']) * k
+    high = 0 
+    for x in df.iloc[:,1]:
+        if high < x:
+            high = x
+    low = sys.maxsize
+    for x in df.iloc[:,2]:
+        if low > x:
+            low = x
+    close = df.iloc[7]['close']
+    target_price = close + (high - close) * k
     return target_price
 
 def get_start_time(ticker):
