@@ -91,17 +91,17 @@ while True:
     try:
         now = datetime.datetime.now()
         start_time = get_start_time("KRW-BTC")
-        end_time = start_time + datetime.timedelta(day=1)
+        end_time = start_time + datetime.timedelta(days=1)
         idx = 0
 
         for value in coins.values():
             if start_time < now < end_time - datetime.timedelta(seconds=10):
                 coin_balance = get_balance(value[4:])
-                if value is "KRW-BTC":
+                if value == "KRW-BTC":
                     if coin_balance > 5000/get_current_price(value) and get_profit(value) > 3: # 최소 매도 금액 넘고 수익률 3%이상일때 전량 매도 
                         print("sell ", value)
                         upbit.sell_market_order(value, coin_balance * 0.9995)
-                if value is "KRW-ETH":
+                if value == "KRW-ETH":
                     if coin_balance > 5000/get_current_price(value) and get_profit(value) > 3:
                         print("sell ", value)
                         upbit.sell_market_order(value, coin_balance * 0.9995)
