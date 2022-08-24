@@ -97,7 +97,7 @@ print("autotrade start")
 #평가금액 - 매수금액 (평가손익) / 매수금액 = 수익률
 
 # 자동매매 시작
-flag = TRUE
+flag = True
 
 while True:
     try:
@@ -132,16 +132,16 @@ while True:
                     if krw > 5000:
                         print("buy ", value)
                         upbit.buy_market_order(value, krw*0.3)
-                        flag = FALSE
+                        flag=False
                         
             else:
                 if int(get_profit(value)) < -5 or ma20 > ma5: #수익률 -5%넘어가면 전량매도
                     upbit.sell_market_order(value, coin_balance * 0.9995)
-        if flag == TRUE:
+        if flag == True:
             time.sleep(3)
         else:
             time.sleep(1800)
-            flag = TRUE
+            flag=True
     except Exception as e:
         print(e)
         time.sleep(1)
