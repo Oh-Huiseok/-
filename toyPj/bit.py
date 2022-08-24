@@ -1,3 +1,4 @@
+from pickle import FALSE, TRUE
 import pyupbit
 import pandas as pd
 import time
@@ -16,7 +17,7 @@ secret = keys[1][7:]
 
 def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="minute30", count=12)
+    df = pyupbit.get_ohlcv(ticker, interval="minute30", count=10)
     high = 0 
     for x in df.iloc[:,1]:
         if high < x:
@@ -25,7 +26,7 @@ def get_target_price(ticker, k):
     for x in df.iloc[:,2]:
         if low > x:
             low = x
-    close = df.iloc[7]['close']
+    close = df.iloc[8]['close']
     target_price = close + (high - close) * k
     return target_price
 
@@ -35,18 +36,18 @@ def get_start_time(ticker):
     start_time = df.index[0]
     return start_time
 
-def get_ma15(ticker):
-    """15일 이동 평균선 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=15)
-    ma15 = df['close'].rolling(15).mean().iloc[-1]
-    return ma15
+def get_ma20(ticker):
+    """20일 이동 평균선 조회"""
+    df = pyupbit.get_ohlcv(ticker, interval="minute30", count=20)
+    ma20 = df['close'].rolling(20).mean().iloc[-1]
+    return ma20
 
 
-def get_ma7(ticker):
-    """7일 이동 평균선 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=7)
-    ma7 = df['close'].rolling(7).mean().iloc[-1]
-    return ma7
+def get_ma5(ticker):
+    """5일 이동 평균선 조회"""
+    df = pyupbit.get_ohlcv(ticker, interval="minute30", count=5)
+    ma5 = df['close'].rolling(5).mean().iloc[-1]
+    return ma5
 
 def get_balance(ticker):
     """잔고 조회"""
@@ -96,6 +97,7 @@ print("autotrade start")
 #평가금액 - 매수금액 (평가손익) / 매수금액 = 수익률
 
 # 자동매매 시작
+flag = TRUE
 
 while True:
     try:
@@ -116,24 +118,30 @@ while True:
                         print("sell ", value)
                         upbit.sell_market_order(value, coin_balance * 0.9995)
                 else :
-                    if coin_balance > 1000/get_current_price(value) and get_profit(value > 3):
+                    if coin_balance > 1000/get_current_price(value) and get_profit(value) > 3:
                         print("sell ", value)
                         upbit.sell_market_order(value, coin_balance * 0.9995)
                 
-                target_price = get_target_price(value, 0.4)
-                ma15 = get_ma15(value)
-                ma7 = get_ma7(value)
+                target_price = get_target_price(value, 0.3)
+                ma20 = get_ma20(value)
+                ma5 = get_ma5(value)
                 current_price = get_current_price(value)
                 print(target_price, current_price)
-                if target_price < current_price and ma15 < current_price and ma15 < ma7:
+                if target_price < current_price and ma20 < current_price and ma20 < ma5:
                     krw = get_balance("KRW")
                     if krw > 5000:
                         print("buy ", value)
                         upbit.buy_market_order(value, krw*0.3)
+                        flag = FALSE
+                        
             else:
-                if get_profit(value) < -5: #수익률 -5%넘어가면 전량매도
+                if int(get_profit(value)) < -5 or ma20 > ma5: #수익률 -5%넘어가면 전량매도
                     upbit.sell_market_order(value, coin_balance * 0.9995)
-        time.sleep(3)
+        if flag == TRUE:
+            time.sleep(3)
+        else:
+            time.sleep(1800)
+            flag = TRUE
     except Exception as e:
         print(e)
         time.sleep(1)
