@@ -16,7 +16,7 @@ secret = keys[1][7:]
 
 def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="minute30", count=8)
+    df = pyupbit.get_ohlcv(ticker, interval="minute30", count=12)
     high = 0 
     for x in df.iloc[:,1]:
         if high < x:
