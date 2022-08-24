@@ -120,7 +120,7 @@ while True:
                         print("sell ", value)
                         upbit.sell_market_order(value, coin_balance * 0.9995)
                 
-                target_price = get_target_price(value, 0.5)
+                target_price = get_target_price(value, 0.4)
                 ma15 = get_ma15(value)
                 ma7 = get_ma7(value)
                 current_price = get_current_price(value)
