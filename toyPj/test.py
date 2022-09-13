@@ -19,16 +19,11 @@ def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
     df = pyupbit.get_ohlcv(ticker, interval="minute60", count=24)
     print(df)
-    high = df.iloc[:,1].fillna(0)
-    print(high)
-    for x in df.iloc[:,1]:
-        if high < x:
-            high = x
-    low = sys.maxsize
-    for x in df.iloc[:,2]:
-        if low > x:
-            low = x
+    high = df.iloc[:,1].max()
+    low = df.iloc[:,2].min()
+    print(high, low)
     close = df.iloc[22]['close']
+
     target_price = close + (high - close) * k
     return target_price
 
@@ -62,12 +57,10 @@ def get_balance(ticker):
                 return 0
     return 0
 
-def get_current_price(ticker): # 코인 full 코드 필요, 현재에서 2시간전 가격 조회
+def get_current_price(ticker): # 코인 full 코드 필요
     """현재가 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="minute60", count=3)
-    close = df.iloc[2]['close']
-
-    return close
+    
+    return pyupbit.get_orderbook(ticker=ticker)["orderbook_units"][0]["ask_price"]
 
 def get_avg_buy_price(ticker):
     balances = upbit.get_balances()
@@ -98,8 +91,7 @@ def get_profit(ticker): # 코인 full 코드
 # 로그인
 upbit = pyupbit.Upbit(access, secret)
 print("autotrade start")
-
-print(get_current_price("KRW-BTC"))
+get_target_price("KRW-BTC", 0.4)
 #매수평균가 x 보유수량 = 평가금액,
 #매수평균가는 upbit.balances에서 빼오고
 #매수금액 = 매수평균가 * 보유수량

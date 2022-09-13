@@ -14,19 +14,15 @@ profit_delta = {0, 0, 0} #미구현
 
 access = keys[0][7:]
 secret = keys[1][7:]
-
 def get_target_price(ticker, k):
     """변동성 돌파 전략으로 매수 목표가 조회"""
     df = pyupbit.get_ohlcv(ticker, interval="minute60", count=24)
-    high = 0 
-    for x in df.iloc[:,1]:
-        if high < x:
-            high = x
-    low = sys.maxsize
-    for x in df.iloc[:,2]:
-        if low > x:
-            low = x
-    close = df.iloc[22]['close']
+    print(df)
+    high = df.iloc[:,1].max()
+    low = df.iloc[:,2].min()
+
+    close = (df.iloc[22]['high'] + df.iloc[22]['close'])/2
+
     target_price = close + (high - close) * k
     return target_price
 
@@ -60,11 +56,11 @@ def get_balance(ticker):
                 return 0
     return 0
 
-def get_current_price(ticker): # 코인 full 코드 필요, 현재에서 2시간전 가격 조회
-    df = pyupbit.get_ohlcv(ticker, interval="minute60", count=3)
-    close = df.iloc[2]['close']
 
-    return close
+def get_current_price(ticker): # 코인 full 코드 필요
+    """현재가 조회"""
+    return pyupbit.get_orderbook(ticker=ticker)["orderbook_units"][0]["ask_price"]
+
 
 def get_avg_buy_price(ticker):
     balances = upbit.get_balances()
