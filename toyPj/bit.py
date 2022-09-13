@@ -60,9 +60,11 @@ def get_balance(ticker):
                 return 0
     return 0
 
-def get_current_price(ticker): # 코인 full 코드 필요
-    """현재가 조회"""
-    return pyupbit.get_orderbook(ticker=ticker)["orderbook_units"][0]["ask_price"]
+def get_current_price(ticker): # 코인 full 코드 필요, 현재에서 2시간전 가격 조회
+    df = pyupbit.get_ohlcv(ticker, interval="minute60", count=3)
+    close = df.iloc[2]['close']
+
+    return close
 
 def get_avg_buy_price(ticker):
     balances = upbit.get_balances()
@@ -126,6 +128,7 @@ while True:
             ma5 = get_ma5(value)
             current_price = get_current_price(value)
             print(target_price, current_price)
+           
             #변동성 돌파, 10시간 이동평균선이 현재가격보다 낮을때, 골든크로스 넘을때 매수
             if target_price < current_price and ma20 < current_price and ma20 < ma5:
                 krw = get_balance("KRW")
